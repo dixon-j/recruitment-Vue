@@ -53,8 +53,8 @@ export default {
       pages: [
         { title: 'Chats', icon: 'mdi-message-text', link: '/' },
         { title: 'Outreach', icon: 'mdi-contacts', link: '/outreach' },
-        { title: 'Positions', icon: 'mdi-clipboard-list', link: '/positions' }
-        // { title: 'Candidates', icon: 'mdi-desktop-mac-dashboard', link: '/candidates' }
+        { title: 'Positions', icon: 'mdi-clipboard-list', link: '/positions' },
+        { title: 'Candidates', icon: 'mdi-desktop-mac-dashboard', link: '/candidates' }
       ]
     }
   }

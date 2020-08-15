@@ -7,14 +7,13 @@ const server = process.env.VUE_APP_REST_SERVER
 const candidateUrl = server + 'candidates/'
 const vacancyUrl = server + 'vacancies/'
 const chatUrl = server + 'conversation/'
-console.log(vacancyUrl)
 
 export default new Vuex.Store({
   state: {
     vacancies: [],
     candidates: [],
     selectedVacancyId: false, // The currently selected vacancy jobid
-    currentCandidate: { _id: null, name: '', value: '', active: '', jobId: '', notes: '', chat: [] },
+    currentCandidate: { _id: null, name: '', score: '', active: '', jobId: '', notes: '', chat: [] },
     globalError: '',
     loading: false
   },
@@ -55,7 +54,7 @@ export default new Vuex.Store({
     },
     setCurrentCandidate: (state, payload) => {
       state.currentCandidate = {}
-      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', value: '', active: '', jobId: '', notes: '', chat: [] })
+      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', score: '', active: '', jobId: '', notes: '', chat: [] })
       if (payload.id) {
         const candidate = state.candidates.find(candidate => candidate._id === payload.id)
         if (payload.chat) {
