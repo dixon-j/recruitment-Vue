@@ -107,12 +107,10 @@ export default {
     sendLoading: false,
     message: '',
     dummy: [1, 2, 3, 4, 5, 6, 7, 8],
-    curChannel: { title: 'Whatsapp', icon: 'mdi-whatsapp' },
+    curChannel: { title: 'REST', icon: 'mdi-web' },
     channels: [
-      { title: 'Whatsapp', icon: 'mdi-whatsapp' },
-      { title: 'SMS', icon: 'mdi-message' },
-      { title: 'Facebook', icon: 'mdi-facebook-messenger' },
-      { title: 'Telegram', icon: 'mdi-telegram' }
+      { title: 'REST', icon: 'mdi-web' },
+      { title: 'Whatsapp', icon: 'mdi-whatsapp' }
     ]
   }),
   computed: {
