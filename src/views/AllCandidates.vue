@@ -190,7 +190,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['candidates']),
+    ...mapState(['candidates', 'recruiter']),
     numberOfPages () {
       return Math.ceil(this.candidates.length / this.itemsPerPage)
     },
@@ -220,6 +220,11 @@ export default {
   },
   mounted () {
     this.fetchData()
+  },
+  created () {
+    if (!this.recruiter) {
+      this.$router.push('/')
+    }
   }
 }
 </script>

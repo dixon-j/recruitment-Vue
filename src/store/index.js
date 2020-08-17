@@ -15,7 +15,8 @@ export default new Vuex.Store({
     selectedVacancyId: false, // The currently selected vacancy jobid
     currentCandidate: { _id: null, name: '', score: '', active: '', jobId: '', notes: '', chat: [] },
     globalError: '',
-    loading: false
+    loading: false,
+    recruiter: null
   },
   getters: {
     getCurrentChat: state => state.currentCandidate.chat,
@@ -98,6 +99,9 @@ export default new Vuex.Store({
     },
     toggleLoading: (state) => {
       state.loading = !state.loading
+    },
+    setRecruiter: (state, recruiter) => {
+      state.recruiter = recruiter
     }
   },
   actions: {
@@ -155,9 +159,19 @@ export default new Vuex.Store({
       }).catch(err => { console.log(err) })
     },
     sendMessage: async (context, message) => {
-      await setTimeout(() => {
-        context.commit('sentMessage', message)
-      }, 2000)
+      const msg = {
+        body: message.body,
+        to: message.type + ':' + context.state.currentCandidate.phone
+      }
+      await fetch(`${chatUrl}${message.type}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(msg)
+      }).then(res => res.json()).then(response => {
+        context.commit('sentMessage', response.body)
+      }).catch(err => { console.log(err) })
     },
     addCandidates: async (context, candidates) => {
       await fetch(candidateUrl, {
@@ -191,6 +205,9 @@ export default new Vuex.Store({
       }).then(res => res.json()).then(data => {
         context.commit('addNotes', data.updatedCandidate)
       }).catch(err => console.log(err))
+    },
+    setRecruiter: (context, recruiter) => {
+      context.commit('setRecruiter', recruiter)
     }
   },
   modules: {

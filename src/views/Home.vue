@@ -55,7 +55,7 @@ export default {
     errorMsg: ''
   }),
   computed: {
-    ...mapState(['globalError'])
+    ...mapState(['globalError', 'recruiter'])
   },
   watch: {
     globalError () {
@@ -63,6 +63,11 @@ export default {
         this.errorMsg = this.globalError
         this.snackbar = true
       }
+    }
+  },
+  created () {
+    if (!this.recruiter) {
+      this.$router.push('/')
     }
   }
 }

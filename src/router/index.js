@@ -4,12 +4,18 @@ import Home from '../views/Home.vue'
 import Outreach from '../views/Outreach.vue'
 import Positions from '../views/Positions.vue'
 import AllCandidates from '../views/AllCandidates.vue'
+import login from '../views/login.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    name: 'login',
+    component: login
+  },
+  {
+    path: '/dashboard',
     name: 'Home',
     component: Home
   },

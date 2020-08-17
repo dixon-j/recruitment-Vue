@@ -123,7 +123,7 @@ export default {
     ]
   }),
   computed: {
-    ...mapState(['vacancies']),
+    ...mapState(['vacancies', 'recruiter']),
     getPositions () {
       const positions = this.vacancies.map(vacancy => { // this will add the location to the position title in the select menu
         return {
@@ -155,6 +155,11 @@ export default {
   },
   mounted () {
     this.fetchData()
+  },
+  created () {
+    if (!this.recruiter) {
+      this.$router.push('/')
+    }
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Navbar/>
+    <Navbar v-if="recruiter"/>
     <v-main>
         <router-view/>
     </v-main>
@@ -9,13 +9,13 @@
 
 <script>
 import Navbar from './components/Navbar'
-
+import { mapState } from 'vuex'
 export default {
   name: 'App',
-
   components: {
     Navbar
-  }
+  },
+  computed: { ...mapState(['recruiter']) }
 }
 </script>
 

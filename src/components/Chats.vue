@@ -60,14 +60,43 @@
         <v-text-field
           v-model="message"
           append-outer-icon="mdi-send"
-          prepend-icon="mdi-message"
           clear-icon="mdi-close-circle"
           clearable
           label="Message"
           type="text"
           :loading="sendLoading"
+          @keyup.enter="sendChat"
           @click:append-outer="sendChat"
-        ></v-text-field>
+        >
+          <template v-slot:prepend>
+            <v-menu
+              style="top: -12px"
+              offset-y
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  v-bind="attrs"
+                  v-on="on"
+                  icon
+                >
+                  <v-icon v-text="curChannel.icon">mdi-facebook-messenger</v-icon>
+                </v-btn>
+              </template>
+              <v-list dense>
+                <v-list-item
+                  v-for="(channel, index) in channels"
+                  :key="index"
+                  @click="curChannel=channels[index]"
+                >
+                  <v-list-item-icon>
+                    <v-icon v-text="channel.icon"></v-icon>
+                  </v-list-item-icon>
+                  <v-list-item-title>{{ channel.title }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
+        </v-text-field>
       </v-container>
   </v-container>
 </template>
@@ -77,7 +106,14 @@ export default {
   data: () => ({
     sendLoading: false,
     message: '',
-    dummy: [1, 2, 3, 4, 5, 6, 7, 8]
+    dummy: [1, 2, 3, 4, 5, 6, 7, 8],
+    curChannel: { title: 'Whatsapp', icon: 'mdi-whatsapp' },
+    channels: [
+      { title: 'Whatsapp', icon: 'mdi-whatsapp' },
+      { title: 'SMS', icon: 'mdi-message' },
+      { title: 'Facebook', icon: 'mdi-facebook-messenger' },
+      { title: 'Telegram', icon: 'mdi-telegram' }
+    ]
   }),
   computed: {
     ...mapState(['currentCandidate', 'loading']),
@@ -106,7 +142,10 @@ export default {
     sendChat () {
       if (this.message) {
         this.sendLoading = true
-        this.sendMessage(this.message)
+        this.sendMessage({
+          body: this.message,
+          type: this.curChannel.title.toLowerCase()
+        })
         this.message = ''
         setInterval(() => {
           this.sendLoading = false
