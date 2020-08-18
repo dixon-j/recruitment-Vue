@@ -58,7 +58,7 @@ export default new Vuex.Store({
       state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', score: '', active: '', jobId: '', notes: '', chat: [] })
       if (payload.id) {
         const candidate = state.candidates.find(candidate => candidate._id === payload.id)
-        if (payload.chat) {
+        if (payload.chat.length) {
           candidate.chat = payload.chat
         } else {
           candidate.chat = []
@@ -139,9 +139,8 @@ export default new Vuex.Store({
     setCurrentCandidate: async (context, id) => {
       if (id) {
         context.commit('toggleLoading')
-        await fetch(`${chatUrl}?candidate=${id}&vacancy=${context.state.selectedVacancyId}`)
+        await fetch(`${chatUrl}${id}`)
           .then(res => res.json()).then(chat => {
-            chat = chat[0]
             context.commit('setCurrentCandidate', { id, chat })
             context.commit('toggleLoading')
           }).catch(err => { console.log(err) })
@@ -151,8 +150,7 @@ export default new Vuex.Store({
       }
     },
     fetchNewChat: async context => {
-      await fetch(`${chatUrl}?candidate=${context.state.currentCandidate._id}&vacancy=${context.state.selectedVacancyId}`).then(res => res.json()).then(chat => {
-        chat = chat[0]
+      await fetch(`${chatUrl}${context.state.currentCandidate._id}`).then(res => res.json()).then(chat => {
         if (chat) {
           context.commit('updateChat', chat)
         }
@@ -160,18 +158,23 @@ export default new Vuex.Store({
     },
     sendMessage: async (context, message) => {
       const msg = {
-        body: message.body,
-        to: message.type + ':' + context.state.currentCandidate.phone
+        text: message.body,
+        to: message.type + ':' + context.state.currentCandidate.phone,
+        channel: message.type,
+        sender: 'bot'
       }
-      await fetch(`${chatUrl}${message.type}`, {
+      await fetch(`${chatUrl}${context.state.currentCandidate._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(msg)
       }).then(res => res.json()).then(response => {
-        context.commit('sentMessage', response.body)
-      }).catch(err => { console.log(err) })
+        context.commit('sentMessage', response.text)
+      }).catch(err => {
+        context.commit('sentMessage', 'Error Occured, Please try again')
+        console.log(err)
+      })
     },
     addCandidates: async (context, candidates) => {
       await fetch(candidateUrl, {
