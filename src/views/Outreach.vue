@@ -41,7 +41,7 @@
                 v-model="candidate.phone"
                 label="Phone"
                 :rules="phoneRules"
-                maxlength="12"
+                maxlength="13"
                 required
               ></v-text-field>
 
@@ -118,7 +118,6 @@ export default {
     ],
     phoneRules: [
       v => !!v || 'Phone is required',
-      v => !isNaN(v) || 'Invalid Input',
       v => (v || '').length >= 10 || '10 characters required'
     ]
   }),

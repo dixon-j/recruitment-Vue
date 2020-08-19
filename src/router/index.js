@@ -33,6 +33,11 @@ const routes = [
     path: '/candidates',
     name: 'Candidates',
     component: AllCandidates
+  },
+  {
+    path: '*',
+    name: 'error',
+    component: Home
   }
   // {
   //   path: '/about',
