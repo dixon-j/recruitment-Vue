@@ -73,7 +73,7 @@ export default new Vuex.Store({
     },
     sentMessage: (state, message) => {
       const chat = {
-        sender: 'bot',
+        sender: 'recruiter',
         text: message
       }
       state.currentCandidate.chat.push(chat)
@@ -161,7 +161,8 @@ export default new Vuex.Store({
         text: message.body,
         to: message.type + ':' + context.state.currentCandidate.phone,
         channel: message.type,
-        sender: 'bot'
+        uid: context.state.currentCandidate.uid,
+        sender: 'recruiter'
       }
       await fetch(`${chatUrl}${context.state.currentCandidate._id}`, {
         method: 'POST',

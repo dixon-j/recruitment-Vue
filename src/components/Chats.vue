@@ -45,7 +45,7 @@
           <v-list-item v-for="(item, index) in currentCandidate.chat" :key="index">
               <v-list-item-content>
                 <v-row :justify="(item.sender==='user')?'start':'end'">
-                  <v-card max-width="300" class="mx-3" dark :color="(item.sender==='bot')?'blue': 'green'">
+                  <v-card max-width="300" class="mx-3" dark :color="(item.sender==='bot')?'blue': (item.sender==='user')?'green':'orange'">
                     <v-card-text class="white--text">
                       {{item.text}}
                     </v-card-text>
@@ -163,7 +163,7 @@ export default {
     this.scrollToEnd()
     setInterval(() => {
       this.fetchNewChat()
-    }, 25000)
+    }, 2000)
   },
   updated () {
     this.scrollToEnd()
