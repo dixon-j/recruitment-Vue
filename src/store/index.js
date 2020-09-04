@@ -37,9 +37,9 @@ export default new Vuex.Store({
     },
     findFirstCandidate: state => {
       if (state.selectedVacancyId === 'unassigned') {
-        return state.candidates.find(candidate => candidate.jobId.length === 0) //  unassigned candidates will have empty array of jobId
+        return state.candidates.find(candidate => candidate.jobId.length === 0 && candidate.chatType === 'outbound') //  unassigned candidates will have empty array of jobId
       } else {
-        return state.candidates.find(candidate => candidate.jobId.includes(state.selectedVacancyId))
+        return state.candidates.find(candidate => candidate.jobId.includes(state.selectedVacancyId) && candidate.chatType === 'outbound')
       }
     }
   },
@@ -84,6 +84,11 @@ export default new Vuex.Store({
       })
     },
     addVacancy: (state, payload) => {
+      if (payload._id === 'unassigned') {
+        if (state.vacancies.find(vacancy => vacancy._id === 'unassigned')) {
+          return
+        }
+      }
       state.vacancies.push(payload)
     },
     addNotes: (state, payload) => {
@@ -135,6 +140,28 @@ export default new Vuex.Store({
         context.commit('setglobalError', 'Failed to connect to the server !')
       })
     },
+    fetchNewData: async context => {
+      await fetch(vacancyUrl).then(res => res.json()).then(data => {
+        context.commit('setVacancies', data)
+      }).catch(err => {
+        console.log(err)
+      })
+      await fetch(candidateUrl).then(res => res.json()).then(data => {
+        context.commit('setCandidates', data)
+        const unassigned = {
+          _id: 'unassigned',
+          jobTitle: 'Unassigned',
+          applicationReceived: context.state.candidates.filter((candidate) => {
+            if (candidate.jobId.length === 0) {
+              return true
+            }
+          }).length
+        }
+        context.commit('addVacancy', unassigned)
+      }).catch(err => {
+        console.log(err)
+      })
+    },
     setSelectedVacancy: (context, jobid) => {
       context.commit('setSelectedVacancy', jobid)
       const firstCandidate = context.getters.findFirstCandidate
@@ -154,8 +181,9 @@ export default new Vuex.Store({
       }
     },
     fetchNewChat: async context => {
-      await fetch(`${chatUrl}${context.state.currentCandidate._id}`).then(res => res.json()).then(chat => {
-        if (chat) {
+      const id = context.state.currentCandidate._id
+      await fetch(`${chatUrl}${id}`).then(res => res.json()).then(chat => {
+        if (chat && id === context.state.currentCandidate._id) {
           context.commit('updateChat', chat)
         }
       }).catch(err => { console.log(err) })

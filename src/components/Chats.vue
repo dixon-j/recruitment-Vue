@@ -186,7 +186,7 @@ export default {
     this.scrollToEnd()
     setInterval(() => {
       this.fetchNewChat()
-    }, 30000)
+    }, 2000)
   },
   updated () {
     this.scrollToEnd()

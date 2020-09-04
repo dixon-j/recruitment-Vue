@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
   name: 'Outreach',
   data: () => ({
@@ -149,7 +149,6 @@ export default {
     ]
   }),
   computed: {
-    ...mapGetters(['getVacancies']),
     ...mapState(['recruiter'])
   },
   methods: {
