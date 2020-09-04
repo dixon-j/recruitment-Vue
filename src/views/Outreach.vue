@@ -110,7 +110,8 @@ export default {
       avatar: '',
       currentPosition: '',
       currentCompany: '',
-      currentLocation: ''
+      currentLocation: '',
+      chatType: 'outbound'
     },
     emailRules: [
       v => !!v || 'E-mail is required',

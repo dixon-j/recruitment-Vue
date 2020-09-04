@@ -24,6 +24,29 @@
         <v-list-item-content>
           {{currentCandidate.name}}
         </v-list-item-content>
+        <v-menu>
+          <template v-slot:activator="{ on, attrs }">
+            <v-chip
+              class="ma-2"
+              color="success"
+              outlined
+              v-bind="attrs"
+              v-on="on"
+            >
+              {{currentCandidate.chatState}}
+            </v-chip>
+          </template>
+
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in ['active', 'inactive', 'complete']"
+              :key="index"
+              @click="candidateStateChange(item)"
+            >
+              <v-list-item-title>{{ item }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-list-item>
     </v-list>
     <div :style="{height:height,overflow:'auto',scrollbarWidth: 'thin'}" ref="chatlog">
@@ -132,7 +155,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['fetchNewChat', 'sendMessage']),
+    ...mapActions(['fetchNewChat', 'sendMessage', 'candidateStateChange']),
     scrollToEnd () {
       var chatlog = this.$refs.chatlog
       chatlog.scrollTop = chatlog.scrollHeight
@@ -163,7 +186,7 @@ export default {
     this.scrollToEnd()
     setInterval(() => {
       this.fetchNewChat()
-    }, 2000)
+    }, 30000)
   },
   updated () {
     this.scrollToEnd()

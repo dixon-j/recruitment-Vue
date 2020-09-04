@@ -55,7 +55,7 @@ export default new Vuex.Store({
     },
     setCurrentCandidate: (state, payload) => {
       state.currentCandidate = {}
-      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', score: '', active: '', jobId: '', notes: '', chat: [] })
+      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', score: '', chatState: '', jobId: '', notes: '', chat: [] })
       if (payload.id) {
         const candidate = state.candidates.find(candidate => candidate._id === payload.id)
         if (payload.chat.length) {
@@ -102,6 +102,10 @@ export default new Vuex.Store({
     },
     setRecruiter: (state, recruiter) => {
       state.recruiter = recruiter
+    },
+    changeState: (state, chatState) => {
+      state.currentCandidate.chatState = chatState
+      state.candidates.find(candidate => candidate._id === state.currentCandidate._id).chatState = chatState
     }
   },
   actions: {
@@ -212,6 +216,17 @@ export default new Vuex.Store({
     },
     setRecruiter: (context, recruiter) => {
       context.commit('setRecruiter', recruiter)
+    },
+    candidateStateChange: async (context, chatState) => {
+      await fetch(candidateUrl + context.state.currentCandidate._id, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatState })
+      }).then(res => res.json()).then(data => {
+        context.commit('changeState', chatState)
+      }).catch(err => console.log(err))
     }
   },
   modules: {
