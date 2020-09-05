@@ -88,7 +88,7 @@ export default {
     }
   },
   watch: {
-    getCandidates () { // when a new vacancy is selected this will reset the current selected candidate to 1st position
+    searchCandidate () { // when a new vacancy is selected this will reset the current selected candidate to 1st position
       this.model = 0
     }
   },

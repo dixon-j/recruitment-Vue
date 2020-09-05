@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 // import tempFakeData from './tempFakeData'
 
 Vue.use(Vuex)
@@ -7,6 +8,7 @@ const server = process.env.VUE_APP_REST_SERVER
 const candidateUrl = server + 'candidates/'
 const vacancyUrl = server + 'vacancies/'
 const chatUrl = server + 'conversation/'
+let chatCancelToken = null
 
 export default new Vuex.Store({
   state: {
@@ -80,6 +82,15 @@ export default new Vuex.Store({
     },
     addCandidates: (state, payload) => {
       payload.forEach(candidate => {
+        if (candidate.jobId.length === 0) {
+          const vacancy = state.vacancies.find(vacancy => vacancy._id === 'unassigned')
+          vacancy.applicationReceived += 1
+        } else {
+          candidate.jobId.forEach(jobid => {
+            const vacancy = state.vacancies.find(vacancy => vacancy._id === jobid)
+            vacancy.applicationReceived += 1
+          })
+        }
         state.candidates.push(candidate)
       })
     },
@@ -135,31 +146,38 @@ export default new Vuex.Store({
           }).length
         }
         context.commit('addVacancy', unassigned)
+        context.dispatch('fetchNewData')
       }).catch(err => {
         console.log(err)
         context.commit('setglobalError', 'Failed to connect to the server !')
       })
     },
     fetchNewData: async context => {
-      await fetch(vacancyUrl).then(res => res.json()).then(data => {
-        context.commit('setVacancies', data)
-      }).catch(err => {
-        console.log(err)
-      })
-      await fetch(candidateUrl).then(res => res.json()).then(data => {
-        context.commit('setCandidates', data)
-        const unassigned = {
-          _id: 'unassigned',
-          jobTitle: 'Unassigned',
-          applicationReceived: context.state.candidates.filter((candidate) => {
-            if (candidate.jobId.length === 0) {
-              return true
+      await fetch(vacancyUrl).then(res => res.json()).then(async data => {
+        data.forEach(vac => {
+          if (!context.state.vacancies.find(vacancy => vacancy._id === vac._id)) {
+            context.commit('addVacancy', vac)
+          }
+        })
+        await fetch(candidateUrl).then(res => res.json()).then(data => {
+          const newCandidates = []
+          data.forEach(cand => {
+            if (!context.state.candidates.find(candidate => candidate._id === cand._id)) {
+              newCandidates.push(cand)
             }
-          }).length
-        }
-        context.commit('addVacancy', unassigned)
+          })
+          if (newCandidates.length > 0) {
+            context.commit('addCandidates', newCandidates)
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+        setTimeout(() => {
+          context.dispatch('fetchNewData')
+        }, 20000)
       }).catch(err => {
         console.log(err)
+        context.dispatch('fetchNewData')
       })
     },
     setSelectedVacancy: (context, jobid) => {
@@ -169,11 +187,16 @@ export default new Vuex.Store({
     },
     setCurrentCandidate: async (context, id) => {
       if (id) {
+        if (chatCancelToken) {
+          chatCancelToken.cancel()
+        }
+        chatCancelToken = axios.CancelToken.source()
         context.commit('toggleLoading')
         await fetch(`${chatUrl}${id}`)
           .then(res => res.json()).then(chat => {
             context.commit('setCurrentCandidate', { id, chat })
             context.commit('toggleLoading')
+            context.dispatch('fetchNewChat')
           }).catch(err => { console.log(err) })
       } else {
         const chat = []
@@ -182,11 +205,22 @@ export default new Vuex.Store({
     },
     fetchNewChat: async context => {
       const id = context.state.currentCandidate._id
-      await fetch(`${chatUrl}${id}`).then(res => res.json()).then(chat => {
-        if (chat && id === context.state.currentCandidate._id) {
-          context.commit('updateChat', chat)
+      axios.get(`${chatUrl}${id}?size=${context.state.currentCandidate.chat.length}`, { cancelToken: chatCancelToken.token }).then(response => {
+        if (response.data && id === context.state.currentCandidate._id) {
+          context.commit('updateChat', response.data)
         }
-      }).catch(err => { console.log(err) })
+        context.dispatch('fetchNewChat')
+      }).catch(err => {
+        if (!axios.isCancel(err)) {
+          console.log(err)
+          context.dispatch('fetchNewChat')
+        }
+      })
+      // await fetch(`${chatUrl}${id}`).then(res => res.json()).then(chat => {
+      //   if (chat && id === context.state.currentCandidate._id) {
+      //     context.commit('updateChat', chat)
+      //   }
+      // }).catch(err => { console.log(err) })
     },
     sendMessage: async (context, message) => {
       const msg = {

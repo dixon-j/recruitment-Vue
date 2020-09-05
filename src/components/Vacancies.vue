@@ -85,11 +85,7 @@ export default {
     }
   },
   mounted () {
-    // this.$store.dispatch('fetchVacancies')
     this.fetchData()
-    // setInterval(() => {
-    //   this.fetchNewData()
-    // }, 10000)
   }
 }
 </script>

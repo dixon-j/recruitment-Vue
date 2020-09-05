@@ -184,9 +184,9 @@ export default {
   },
   mounted () {
     this.scrollToEnd()
-    setInterval(() => {
-      this.fetchNewChat()
-    }, 2000)
+    // setInterval(() => {
+    // }, 20000)
+    // this.fetchNewChat()
   },
   updated () {
     this.scrollToEnd()
