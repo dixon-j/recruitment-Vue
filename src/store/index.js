@@ -5,9 +5,9 @@ import axios from 'axios'
 
 Vue.use(Vuex)
 const server = process.env.VUE_APP_REST_SERVER
-const candidateUrl = server + 'candidates/'
-const vacancyUrl = server + 'vacancies/'
-const chatUrl = server + 'conversation/'
+const candidateUrl = server + 'api/candidates/'
+const vacancyUrl = server + 'api/vacancies/'
+const chatUrl = server + 'api/conversation/'
 let chatCancelToken = null
 
 export default new Vuex.Store({

@@ -43,6 +43,8 @@
           <v-btn
             color="blue"
             class="white--text"
+            v-if="currentCandidate.resume"
+            @click="downloadWithAxios(currentCandidate.resume)"
           >
             Resume
             <v-icon> mdi-download </v-icon>
@@ -71,6 +73,7 @@
 </template>
 <script>
 import { mapState, mapActions } from 'vuex'
+import axios from 'axios'
 export default {
   data: () => ({
     note: '',
@@ -131,6 +134,27 @@ export default {
         this.save = 'error'
         this.saving = false
       }
+    },
+    forceFileDownload (response, title) {
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', title)
+      document.body.appendChild(link)
+      link.click()
+    },
+    downloadWithAxios (url) {
+      const title = url.split('/')[1]
+      url = process.env.VUE_APP_REST_SERVER + url
+      axios({
+        method: 'get',
+        url,
+        responseType: 'arraybuffer'
+      })
+        .then((response) => {
+          this.forceFileDownload(response, title)
+        })
+        .catch(() => console.log('error occured'))
     }
   }
 }

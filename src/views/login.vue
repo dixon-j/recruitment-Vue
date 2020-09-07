@@ -48,6 +48,8 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
+                  <span class="red--text ml-12">{{msg}}</span>
+                  <v-spacer></v-spacer>
                   <v-btn color="primary" @click="login" :loading="loading">Login</v-btn>
                 </v-card-actions>
               </v-card>
@@ -67,6 +69,7 @@ export default {
     valid: true,
     username: '',
     password: '',
+    msg: '',
     loading: false
   }),
   computed: { ...mapState(['recruiter']) },
@@ -74,12 +77,16 @@ export default {
     ...mapActions(['setRecruiter']),
     login () {
       if (this.$refs.form.validate()) {
-        this.loading = true
-        this.setRecruiter(this.username)
-        setTimeout(() => {
-          this.loading = false
-          this.$router.push('dashboard')
-        }, 1000)
+        if (this.username === 'recruiter' && this.password === 'password') {
+          this.loading = true
+          this.setRecruiter(this.username)
+          setTimeout(() => {
+            this.loading = false
+            this.$router.push('dashboard')
+          }, 1000)
+        } else {
+          this.msg = 'Incorrect username or password'
+        }
       }
     }
   },
