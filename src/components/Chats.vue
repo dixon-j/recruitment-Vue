@@ -22,7 +22,8 @@
           <v-img :src="currentCandidate.avatar" v-else></v-img>
         </v-list-item-avatar>
         <v-list-item-content>
-          {{currentCandidate.name}}
+          {{currentCandidate.name}}<br>
+          { {{currentCandidate.lastSeen}} }
         </v-list-item-content>
         <v-menu>
           <template v-slot:activator="{ on, attrs }">
@@ -133,7 +134,8 @@ export default {
     curChannel: { title: 'REST', icon: 'mdi-web' },
     channels: [
       { title: 'REST', icon: 'mdi-web' },
-      { title: 'Whatsapp', icon: 'mdi-whatsapp' }
+      { title: 'Whatsapp', icon: 'mdi-whatsapp' },
+      { title: 'SMS', icon: 'mdi-message-text' }
     ]
   }),
   computed: {

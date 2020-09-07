@@ -57,11 +57,16 @@ export default new Vuex.Store({
     },
     setCurrentCandidate: (state, payload) => {
       state.currentCandidate = {}
-      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, name: '', score: '', chatState: '', jobId: '', notes: '', chat: [] })
+      state.currentCandidate = Object.assign({}, state.currentCandidate, { id: null, lastSeen: 'NA', name: '', score: '', chatState: '', jobId: '', notes: '', chat: [] })
       if (payload.id) {
         const candidate = state.candidates.find(candidate => candidate._id === payload.id)
         if (payload.chat.length) {
           candidate.chat = payload.chat
+          candidate.chat.forEach(msg => {
+            if (msg.sender === 'user') {
+              candidate.lastSeen = new Date(msg.createdAt).toLocaleDateString('en-GB') + ' ' + new Date(msg.createdAt).toLocaleTimeString()
+            }
+          })
         } else {
           candidate.chat = []
         }
@@ -71,6 +76,11 @@ export default new Vuex.Store({
     updateChat: (state, chat) => {
       if (state.currentCandidate.chat.length < chat.length) {
         state.currentCandidate.chat = chat
+        chat.forEach(msg => {
+          if (msg.sender === 'user') {
+            state.currentCandidate.lastSeen = new Date(msg.createdAt).toLocaleDateString('en-GB') + ' ' + new Date(msg.createdAt).toLocaleTimeString()
+          }
+        })
       }
     },
     sentMessage: (state, message) => {
@@ -225,10 +235,13 @@ export default new Vuex.Store({
     sendMessage: async (context, message) => {
       const msg = {
         text: message.body,
-        to: message.type + ':' + context.state.currentCandidate.phone,
+        to: context.state.currentCandidate.phone,
         channel: message.type,
         uid: context.state.currentCandidate.uid,
         sender: 'recruiter'
+      }
+      if (message.type === 'whatsapp') {
+        msg.to = message.type + ':' + msg.to
       }
       await fetch(`${chatUrl}${context.state.currentCandidate._id}`, {
         method: 'POST',
@@ -237,10 +250,13 @@ export default new Vuex.Store({
         },
         body: JSON.stringify(msg)
       }).then(res => res.json()).then(response => {
-        context.commit('sentMessage', response.text)
+        let msg = 'Error Occured, Please try again'
+        if (response.text !== undefined) {
+          msg = response.text
+        }
+        context.commit('sentMessage', msg)
       }).catch(err => {
-        context.commit('sentMessage', 'Error Occured, Please try again')
-        console.log(err)
+        console.error(err)
       })
     },
     addCandidates: async (context, candidates) => {
