@@ -38,7 +38,8 @@
       </v-progress-circular>
       </v-row>
       <div class="display-1 text-center mt-5 mb-2" v-if="!loading">{{ currentCandidate.name }}</div>
-      <v-card-subtitle class="text-center pt-0" v-if="!loading"><v-icon size="medium">mdi-phone-outgoing</v-icon> {{currentCandidate.phone}}</v-card-subtitle>
+      <v-card-subtitle class="text-center pt-0" v-if="!loading"><v-icon size="medium">mdi-account-box</v-icon> {{currentCandidate.phone}}<span v-show="currentCandidate.email">, {{currentCandidate.email}}</span></v-card-subtitle>
+      <v-card-subtitle class="text-center pt-0" v-if="!loading"><v-icon size="medium">mdi-card-account-details</v-icon> {{currentCandidate.uid}}</v-card-subtitle>
       <v-row justify="space-around" class="mb-5" v-if="!loading">
           <v-btn
             color="blue"
